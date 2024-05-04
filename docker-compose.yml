@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        NODE_VERSION: 22.0.0
+        ALPINE_VERSION: 3.19
+    environment:
+      PORT: 3000
+      RABBITMQ_HOST: amqp://rabbitmq:5672
+    volumes:
+      - ./:/app
+    tty: true
+    depends_on:
+      - rabbitmq
+    ports:
+      - "3333:3000"
+    networks:
+      - app
+
+  rabbitmq:
+    image: rabbitmq:3.13.1-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: passwd
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    networks:
+      - app
+
+networks:
+  app:
+
+volumes:
+  rabbitmq:
